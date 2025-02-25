@@ -1,6 +1,6 @@
-import { auth, db, storage } from "./firebase";
+import { auth, db } from "./firebase";
 import {
-  signOut,
+  signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
@@ -11,19 +11,51 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  setDoc,
+  getDoc,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Auth functions
-export const logoutUser = () => signOut(auth);
+export const logoutUser = () => firebaseSignOut(auth);
+
+const googleProvider = new GoogleAuthProvider();
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  skillLevel: "beginner" | "intermediate" | "advanced" | "expert";
+  preferences: string[];
+  timeAvailability: "half-day" | "full-day" | "custom";
+  customHours?: { start: string; end: string };
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export const signInWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
+    const result = await signInWithPopup(auth, googleProvider);
+    const { user } = result;
+    
+    // Check if user profile exists
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    
+    if (!userDoc.exists()) {
+      // Create new user profile
+      const newUser: Partial<UserProfile> = {
+        uid: user.uid,
+        email: user.email || '',
+        displayName: user.displayName || '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await setDoc(doc(db, 'users', user.uid), newUser);
+    }
+    
+    return user;
   } catch (error) {
-    console.error("Error signing in with Google", error);
+    console.error('Error signing in with Google:', error);
     throw error;
   }
 };
@@ -46,9 +78,28 @@ export const updateDocument = (collectionName: string, id: string, data: any) =>
 export const deleteDocument = (collectionName: string, id: string) =>
   deleteDoc(doc(db, collectionName, id));
 
-// Storage functions
-export const uploadFile = async (file: File, path: string) => {
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+export const updateUserProfile = async (uid: string, profileData: Partial<UserProfile>) => {
+  try {
+    const userRef = doc(db, 'users', uid);
+    await updateDoc(userRef, {
+      ...profileData,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
+};
+
+export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    if (userDoc.exists()) {
+      return userDoc.data() as UserProfile;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    throw error;
+  }
 };
