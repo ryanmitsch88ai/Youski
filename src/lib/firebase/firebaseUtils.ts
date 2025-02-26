@@ -47,6 +47,7 @@ export interface UserProfile {
     totalVertical: number;
   };
   friends?: string[];
+  achievements?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
