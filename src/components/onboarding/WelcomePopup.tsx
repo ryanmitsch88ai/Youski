@@ -24,12 +24,12 @@ export default function WelcomePopup({ onGetStarted, userName }: WelcomePopupPro
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-xl p-8 max-w-md mx-4 shadow-2xl"
+            className="bg-white rounded-xl p-8 max-w-md mx-4 shadow-2xl text-gray-900"
           >
-            <h2 className="text-2xl font-bold text-center mb-4">
+            <h2 className="text-2xl font-bold text-center mb-4 text-gray-900">
               Welcome to You Ski{userName ? `, ${userName}` : ""}! 🎿
             </h2>
-            <p className="text-gray-600 text-center mb-6">
+            <p className="text-gray-700 text-center mb-6">
               Ready to personalize your skiing experience? We&apos;ll ask you a few quick questions to help customize your journey.
             </p>
             <div className="flex justify-center">
