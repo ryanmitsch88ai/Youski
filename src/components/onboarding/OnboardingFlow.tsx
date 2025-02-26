@@ -6,9 +6,9 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import WelcomePopup from "./WelcomePopup";
 
-type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
+type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert" | "";
 type TerrainPreference = "groomed" | "powder" | "park" | "backcountry";
-type TimeAvailability = "half-day" | "full-day" | "custom";
+type TimeAvailability = "half-day" | "full-day" | "custom" | "";
 
 interface UserProfile {
   skillLevel: SkillLevel;
@@ -18,9 +18,9 @@ interface UserProfile {
 }
 
 const defaultProfile: UserProfile = {
-  skillLevel: "beginner",
-  preferences: ["groomed"],
-  timeAvailability: "full-day",
+  skillLevel: "" as SkillLevel,
+  preferences: [],
+  timeAvailability: "" as TimeAvailability,
 };
 
 export default function OnboardingFlow() {
@@ -42,10 +42,14 @@ export default function OnboardingFlow() {
     const newProfile = { ...profile, [key]: value };
     setProfile(newProfile);
     
-    if (user && step === 3) {
+    if (user && step === 3 && newProfile.skillLevel && newProfile.timeAvailability) {
       try {
-        await updateProfile(newProfile);
-        // Will handle navigation in handleComplete
+        const validProfile = {
+          ...newProfile,
+          skillLevel: newProfile.skillLevel as Exclude<SkillLevel, "">,
+          timeAvailability: newProfile.timeAvailability as Exclude<TimeAvailability, "">
+        };
+        await updateProfile(validProfile);
       } catch (error) {
         console.error('Error updating profile:', error);
       }
@@ -71,8 +75,15 @@ export default function OnboardingFlow() {
     try {
       setIsSaving(true);
       setError(null);
-      await updateProfile(profile);
-      router.push('/map');
+      if (profile.skillLevel && profile.timeAvailability) {
+        const validProfile = {
+          ...profile,
+          skillLevel: profile.skillLevel as Exclude<SkillLevel, "">,
+          timeAvailability: profile.timeAvailability as Exclude<TimeAvailability, "">
+        };
+        await updateProfile(validProfile);
+        router.push('/map');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       setError(error instanceof Error ? error.message : 'Failed to save profile');
@@ -145,23 +156,31 @@ export default function OnboardingFlow() {
       </div>
 
       {step === 1 && (
-        <div className="grid grid-cols-2 gap-4">
-          {(["beginner", "intermediate", "advanced", "expert"] as SkillLevel[]).map((level) => (
-            <button
-              key={level}
-              onClick={() => {
-                updateProfileData("skillLevel", level);
-                setStep(2);
-              }}
-              className={`p-4 rounded-lg border-2 ${
-                profile.skillLevel === level
-                  ? "border-blue-500 bg-blue-50 text-black"
-                  : "border-gray-200 hover:border-blue-300 text-black"
-              }`}
-            >
-              <div className="font-semibold capitalize">{level}</div>
-            </button>
-          ))}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {(["beginner", "intermediate", "advanced", "expert"] as SkillLevel[]).map((level) => (
+              <button
+                key={level}
+                onClick={() => {
+                  updateProfileData("skillLevel", level);
+                }}
+                className={`p-4 rounded-lg border-2 ${
+                  profile.skillLevel === level
+                    ? "border-blue-500 bg-blue-50 text-black"
+                    : "border-gray-200 hover:border-blue-300 text-black"
+                }`}
+              >
+                <div className="font-semibold capitalize">{level}</div>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setStep(2)}
+            disabled={!profile.skillLevel}
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300"
+          >
+            Continue
+          </button>
         </div>
       )}
 
@@ -217,8 +236,8 @@ export default function OnboardingFlow() {
 
           <button
             onClick={handleComplete}
-            disabled={isSaving}
-            className="w-full mt-6 bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300 flex items-center justify-center"
+            disabled={isSaving || !profile.timeAvailability}
+            className="w-full mt-6 bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 flex items-center justify-center"
           >
             {isSaving ? (
               <>
