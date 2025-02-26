@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MapPinIcon, CalendarIcon, TrophyIcon, UsersIcon, MountainIcon } from "lucide-react";
 import EditProfileModal from "@/components/profile/EditProfileModal";
+import AnimatedNumber from "@/components/ui/AnimatedNumber";
+import { motion } from "framer-motion";
 import { Resort } from "@/types/resort";
 
 type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
@@ -39,6 +41,21 @@ interface ProgressStats {
   longestRun: number;
   totalVertical: number;
 }
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 export default function ProfilePage() {
   const { user, userProfile, updateProfile } = useAuth();
@@ -86,7 +103,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-lg text-gray-700">Please sign in to view your profile.</p>
+        <p className="text-lg text-gray-700 dark:text-gray-300">Please sign in to view your profile.</p>
       </div>
     );
   }
@@ -100,99 +117,132 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={container}
+      className="max-w-7xl mx-auto px-4 py-8"
+    >
       {/* Main Profile Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Profile Info */}
-        <div className="lg:col-span-1 space-y-6">
+        <motion.div variants={item} className="lg:col-span-1 space-y-6">
           {/* Profile Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="flex flex-col items-center">
-              <div className="relative w-32 h-32 rounded-full overflow-hidden mb-6 ring-4 ring-blue-100">
-                {user.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt="Profile"
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white text-4xl">
-                    {user.displayName?.[0] || user.email?.[0] || '?'}
-                  </div>
-                )}
+          <div className="relative overflow-hidden bg-white dark:bg-dark-card rounded-2xl shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/5 dark:to-purple-500/5" />
+            <div className="relative p-8">
+              <div className="flex flex-col items-center">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="relative w-32 h-32 rounded-full overflow-hidden mb-6 ring-4 ring-blue-100 dark:ring-blue-900 shadow-lg"
+                >
+                  {user.photoURL ? (
+                    <Image
+                      src={user.photoURL}
+                      alt="Profile"
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-4xl">
+                      {user.displayName?.[0] || user.email?.[0] || '?'}
+                    </div>
+                  )}
+                </motion.div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-1">
+                  {user.displayName || 'Skier'}
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{user.email}</p>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  Edit Profile
+                </motion.button>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 text-center mb-1">
-                {user.displayName || 'Skier'}
-              </h1>
-              <p className="text-gray-600 mb-4">{user.email}</p>
-              <button
-                onClick={() => setIsEditModalOpen(true)}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Edit Profile
-              </button>
-            </div>
 
-            {/* Skill Level & Preferences */}
-            <div className="mt-8 space-y-4">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">
-                  Skill Level
-                </h3>
-                <p className="text-gray-700 capitalize">{userProfile?.skillLevel || 'Not set'}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">
-                  Preferred Terrain
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {userProfile?.preferences?.map((pref) => (
-                    <span key={pref} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm capitalize">
-                      {pref}
-                    </span>
-                  ))}
+              {/* Skill Level & Preferences */}
+              <div className="mt-8 space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-2">
+                    Skill Level
+                  </h3>
+                  <p className="text-gray-700 dark:text-gray-300 capitalize">{userProfile?.skillLevel || 'Not set'}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-2">
+                    Preferred Terrain
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {userProfile?.preferences?.map((pref) => (
+                      <motion.span
+                        key={pref}
+                        whileHover={{ scale: 1.05 }}
+                        className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full text-sm capitalize shadow-sm"
+                      >
+                        {pref}
+                      </motion.span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Progress Stats Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Progress Stats</h2>
+          <motion.div variants={item} className="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-8">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Progress Stats</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Days Skied</span>
-                <span className="text-gray-900 font-semibold">{progressStats.daysSkied}</span>
+                <span className="text-gray-600 dark:text-gray-400">Days Skied</span>
+                <AnimatedNumber
+                  value={progressStats.daysSkied}
+                  className="text-gray-900 dark:text-white font-semibold"
+                />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Highest Altitude</span>
-                <span className="text-gray-900 font-semibold">{progressStats.highestAltitude}′</span>
+                <span className="text-gray-600 dark:text-gray-400">Highest Altitude</span>
+                <AnimatedNumber
+                  value={progressStats.highestAltitude}
+                  unit="′"
+                  className="text-gray-900 dark:text-white font-semibold"
+                />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Longest Run</span>
-                <span className="text-gray-900 font-semibold">{progressStats.longestRun} miles</span>
+                <span className="text-gray-600 dark:text-gray-400">Longest Run</span>
+                <AnimatedNumber
+                  value={progressStats.longestRun}
+                  unit=" miles"
+                  className="text-gray-900 dark:text-white font-semibold"
+                />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total Vertical</span>
-                <span className="text-gray-900 font-semibold">{progressStats.totalVertical}′</span>
+                <span className="text-gray-600 dark:text-gray-400">Total Vertical</span>
+                <AnimatedNumber
+                  value={progressStats.totalVertical}
+                  unit="′"
+                  className="text-gray-900 dark:text-white font-semibold"
+                />
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Right Column - Additional Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Favorite Resorts */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Favorite Resorts</h2>
+          <motion.div variants={item} className="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-8">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Favorite Resorts</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {favoriteResorts.length > 0 ? (
                 favoriteResorts.map((resort) => (
-                  <div
+                  <motion.div
                     key={resort.id}
+                    whileHover={{ scale: 1.02 }}
                     onClick={() => router.push(`/resorts/${resort.id}`)}
-                    className="flex items-center p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="flex items-center p-4 bg-gray-50 dark:bg-dark-accent rounded-lg cursor-pointer hover:shadow-md transition-all duration-200"
                   >
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden mr-4">
                       <Image
@@ -203,23 +253,27 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{resort.name}</h3>
-                      <p className="text-sm text-gray-600">{resort.location.state}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{resort.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{resort.location.state}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               ) : (
-                <p className="text-gray-600 col-span-2">No favorite resorts added yet.</p>
+                <p className="text-gray-600 dark:text-gray-400 col-span-2">No favorite resorts added yet.</p>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Skiing Goals */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Skiing Goals</h2>
+          <motion.div variants={item} className="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-8">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Skiing Goals</h2>
             <div className="space-y-4">
               {skiGoals.map((goal) => (
-                <div key={goal.id} className="flex items-center">
+                <motion.div
+                  key={goal.id}
+                  whileHover={{ scale: 1.01 }}
+                  className="flex items-center"
+                >
                   <input
                     type="checkbox"
                     checked={goal.completed}
@@ -228,23 +282,28 @@ export default function ProfilePage() {
                     }}
                     className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className={`ml-3 ${goal.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                  <span className={`ml-3 ${
+                    goal.completed
+                      ? 'line-through text-gray-400 dark:text-gray-600'
+                      : 'text-gray-700 dark:text-gray-300'
+                  }`}>
                     {goal.title}
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Recent Trips */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Trips</h2>
+          <motion.div variants={item} className="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-8">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Recent Trips</h2>
             {recentTrips.length > 0 ? (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {recentTrips.map((trip) => (
-                  <div
+                  <motion.div
                     key={`${trip.resortId}-${trip.date}`}
-                    className="flex items-center p-4 bg-gray-50 rounded-lg"
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center p-4 bg-gray-50 dark:bg-dark-accent rounded-lg"
                   >
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden mr-4">
                       <Image
@@ -255,24 +314,30 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{trip.resortName}</h3>
-                      <p className="text-sm text-gray-600">{new Date(trip.date).toLocaleDateString()}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{trip.resortName}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {new Date(trip.date).toLocaleDateString()}
+                      </p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600">No recent trips recorded.</p>
+              <p className="text-gray-600 dark:text-gray-400">No recent trips recorded.</p>
             )}
-          </div>
+          </motion.div>
 
           {/* Friends */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Ski Friends</h2>
+          <motion.div variants={item} className="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-8">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Ski Friends</h2>
             {friends.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {friends.map((friend) => (
-                  <div key={friend.id} className="flex items-center p-4 bg-gray-50 rounded-lg">
+                  <motion.div
+                    key={friend.id}
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center p-4 bg-gray-50 dark:bg-dark-accent rounded-lg"
+                  >
                     <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
                       <Image
                         src={friend.photoUrl}
@@ -282,16 +347,16 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{friend.name}</h3>
-                      <p className="text-sm text-gray-600 capitalize">{friend.skillLevel}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{friend.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{friend.skillLevel}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600">No friends added yet.</p>
+              <p className="text-gray-600 dark:text-gray-400">No friends added yet.</p>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -304,6 +369,6 @@ export default function ProfilePage() {
           onSave={updateProfile}
         />
       )}
-    </div>
+    </motion.div>
   );
 } 
