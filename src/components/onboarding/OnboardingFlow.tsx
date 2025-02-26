@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useRouter } from "next/navigation";
 
 type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
 type TerrainPreference = "groomed" | "powder" | "park" | "backcountry";
@@ -22,10 +23,12 @@ const defaultProfile: UserProfile = {
 };
 
 export default function OnboardingFlow() {
+  const router = useRouter();
   const { user, loading, login, updateProfile } = useAuth();
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const updateProfileData = async (key: keyof UserProfile, value: any) => {
@@ -54,6 +57,20 @@ export default function OnboardingFlow() {
       setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
     } finally {
       setIsLoggingIn(false);
+    }
+  };
+
+  const handleComplete = async () => {
+    try {
+      setIsSaving(true);
+      setError(null);
+      await updateProfile(profile);
+      router.push('/map');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save profile');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -181,6 +198,21 @@ export default function OnboardingFlow() {
               <div className="font-semibold capitalize">{time.replace("-", " ")}</div>
             </button>
           ))}
+
+          <button
+            onClick={handleComplete}
+            disabled={isSaving}
+            className="w-full mt-6 bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300 flex items-center justify-center"
+          >
+            {isSaving ? (
+              <>
+                <LoadingSpinner />
+                <span className="ml-2">Saving...</span>
+              </>
+            ) : (
+              "Complete Setup & View Map"
+            )}
+          </button>
         </div>
       )}
     </div>
