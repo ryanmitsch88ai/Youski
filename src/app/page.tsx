@@ -9,7 +9,7 @@ export default function Home() {
       {/* Background Image */}
       <div className="fixed inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1551524559-8af4e6624178?q=80&w=2576&auto=format&fit=crop"
+          src="/images/ski-background.jpg"
           alt="Scenic mountain ski background"
           fill
           priority

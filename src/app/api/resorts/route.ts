@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { Resort } from "@/types/resort";
+import { resorts } from "./[id]/route";
 
 // Example resort data - Replace with actual data from your database
 const resorts: Resort[] = [
@@ -604,6 +605,5 @@ const resorts: Resort[] = [
 ];
 
 export async function GET() {
-  // TODO: Replace with actual database query
   return NextResponse.json(resorts);
 } 
