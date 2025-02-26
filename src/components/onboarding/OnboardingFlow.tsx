@@ -98,9 +98,9 @@ export default function OnboardingFlow() {
 
   if (!user) {
     return (
-      <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
-        <h1 className="text-2xl font-bold text-center mb-6 text-black">Welcome to You Ski</h1>
-        <p className="text-gray-700 text-center mb-6">
+      <div className="max-w-md mx-auto mt-10 p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-xl">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-900">Welcome to You Ski</h1>
+        <p className="text-gray-700 text-center mb-8 text-lg">
           Please sign in to create your personalized skiing experience
         </p>
         {error && (
@@ -111,7 +111,7 @@ export default function OnboardingFlow() {
         <button
           onClick={handleLogin}
           disabled={isLoggingIn}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 text-lg font-medium shadow-lg"
         >
           {isLoggingIn ? (
             <span className="flex items-center justify-center">
@@ -136,19 +136,19 @@ export default function OnboardingFlow() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
+    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-xl">
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-6">
           {[1, 2, 3].map((stepNumber) => (
             <div
               key={stepNumber}
               className={`w-1/3 h-2 rounded-full ${
-                stepNumber <= step ? "bg-blue-500" : "bg-gray-200"
-              }`}
+                stepNumber <= step ? "bg-blue-600" : "bg-gray-300"
+              } transition-colors duration-300`}
             />
           ))}
         </div>
-        <h2 className="text-xl font-semibold text-center text-black">
+        <h2 className="text-2xl font-semibold text-center text-gray-900">
           {step === 1 && "What's your skill level?"}
           {step === 2 && "What type of terrain do you prefer?"}
           {step === 3 && "How long do you typically ski?"}
@@ -164,10 +164,10 @@ export default function OnboardingFlow() {
                 onClick={() => {
                   updateProfileData("skillLevel", level);
                 }}
-                className={`p-4 rounded-lg border-2 ${
+                className={`p-4 rounded-lg border-2 transition-all duration-200 ${
                   profile.skillLevel === level
-                    ? "border-blue-500 bg-blue-50 text-black"
-                    : "border-gray-200 hover:border-blue-300 text-black"
+                    ? "border-blue-600 bg-blue-50/90 text-gray-900 shadow-md"
+                    : "border-gray-300 hover:border-blue-400 text-gray-800 hover:bg-white/50"
                 }`}
               >
                 <div className="font-semibold capitalize">{level}</div>
@@ -195,10 +195,10 @@ export default function OnboardingFlow() {
                   : [...profile.preferences, terrain];
                 updateProfileData("preferences", newPreferences);
               }}
-              className={`p-4 rounded-lg border-2 ${
+              className={`p-4 rounded-lg border-2 transition-all duration-200 ${
                 profile.preferences.includes(terrain)
-                  ? "border-blue-500 bg-blue-50 text-black"
-                  : "border-gray-200 hover:border-blue-300 text-black"
+                  ? "border-blue-600 bg-blue-50/90 text-gray-900 shadow-md"
+                  : "border-gray-300 hover:border-blue-400 text-gray-800 hover:bg-white/50"
               }`}
             >
               <div className="font-semibold capitalize">{terrain}</div>
@@ -224,10 +224,10 @@ export default function OnboardingFlow() {
               onClick={() => {
                 updateProfileData("timeAvailability", time);
               }}
-              className={`w-full p-4 rounded-lg border-2 ${
+              className={`w-full p-4 rounded-lg border-2 transition-all duration-200 ${
                 profile.timeAvailability === time
-                  ? "border-blue-500 bg-blue-50 text-black"
-                  : "border-gray-200 hover:border-blue-300 text-black"
+                  ? "border-blue-600 bg-blue-50/90 text-gray-900 shadow-md"
+                  : "border-gray-300 hover:border-blue-400 text-gray-800 hover:bg-white/50"
               }`}
             >
               <div className="font-semibold capitalize">{time.replace("-", " ")}</div>
