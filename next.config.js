@@ -1,22 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable telemetry
-  telemetry: false,
-  
-  // Optimize webpack configuration
+  images: {
+    domains: ['images.unsplash.com', 'source.unsplash.com', 'lh3.googleusercontent.com'],
+  },
+  // Configure webpack for production builds
   webpack: (config, { dev, isServer }) => {
-    // Optimize production builds
+    // Only optimize production builds
     if (!dev) {
-      config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
-        cacheDirectory: '.next/cache',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      }
+      config.cache = true; // Use default cache configuration
     }
-    return config
+    return config;
   },
 }
 
