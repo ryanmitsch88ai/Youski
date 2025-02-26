@@ -259,7 +259,7 @@ export default function ProfilePage() {
                       <p className="text-sm text-gray-600">{new Date(trip.date).toLocaleDateString()}</p>
                     </div>
                   </div>
-                ))
+                ))}
               </div>
             ) : (
               <p className="text-gray-600">No recent trips recorded.</p>
@@ -300,7 +300,7 @@ export default function ProfilePage() {
         <EditProfileModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          userProfile={userProfile}
+          profile={userProfile!}
           onSave={updateProfile}
         />
       )}
