@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { signInWithGoogle, signOut, updateUserProfile } from '../firebase/firebaseUtils';
+import { signInWithGoogle, logoutUser as signOut, updateUserProfile } from '../firebase/firebaseUtils';
 import type { UserProfile } from '../firebase/firebaseUtils';
 
 export function useAuth() {
