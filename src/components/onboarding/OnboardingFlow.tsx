@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useRouter } from "next/navigation";
-import WelcomePopup from "./WelcomePopup";
 
 type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert" | "";
 type TerrainPreference = "groomed" | "powder" | "park" | "backcountry";
@@ -17,26 +16,23 @@ interface UserProfile {
   customHours?: { start: string; end: string };
 }
 
+interface OnboardingFlowProps {
+  onComplete?: () => void;
+}
+
 const defaultProfile: UserProfile = {
   skillLevel: "" as SkillLevel,
   preferences: [],
   timeAvailability: "" as TimeAvailability,
 };
 
-export default function OnboardingFlow() {
+export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const router = useRouter();
-  const { user, loading, login, updateProfile } = useAuth();
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [step, setStep] = useState(0); // Changed to start at 0 for welcome state
+  const { user, loading, updateProfile } = useAuth();
+  const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const handleGetStarted = () => {
-    setShowOnboarding(true);
-    setStep(1);
-  };
 
   const updateProfileData = async (key: keyof UserProfile, value: any) => {
     const newProfile = { ...profile, [key]: value };
@@ -56,21 +52,6 @@ export default function OnboardingFlow() {
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      setIsLoggingIn(true);
-      setError(null);
-      console.log('Starting login process...');
-      await login();
-      console.log('Login completed successfully');
-    } catch (error) {
-      console.error('Login failed:', error);
-      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
   const handleComplete = async () => {
     try {
       setIsSaving(true);
@@ -82,7 +63,7 @@ export default function OnboardingFlow() {
           timeAvailability: profile.timeAvailability as Exclude<TimeAvailability, "">
         };
         await updateProfile(validProfile);
-        router.push('/map');
+        onComplete?.();
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -96,47 +77,8 @@ export default function OnboardingFlow() {
     return <LoadingSpinner />;
   }
 
-  if (!user) {
-    return (
-      <div className="max-w-md mx-auto mt-10 p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-xl">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-900">Welcome to You Ski</h1>
-        <p className="text-gray-700 text-center mb-8 text-lg">
-          Please sign in to create your personalized skiing experience
-        </p>
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
-        <button
-          onClick={handleLogin}
-          disabled={isLoggingIn}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 text-lg font-medium shadow-lg"
-        >
-          {isLoggingIn ? (
-            <span className="flex items-center justify-center">
-              <LoadingSpinner />
-              <span className="ml-2">Signing in...</span>
-            </span>
-          ) : (
-            "Sign In with Google"
-          )}
-        </button>
-      </div>
-    );
-  }
-
-  if (!showOnboarding && step === 0) {
-    return (
-      <WelcomePopup
-        onGetStarted={handleGetStarted}
-        userName={user.displayName?.split(' ')[0]}
-      />
-    );
-  }
-
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-xl">
+    <div className="max-w-2xl mx-auto p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-xl">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           {[1, 2, 3].map((stepNumber) => (
@@ -245,7 +187,7 @@ export default function OnboardingFlow() {
                 <span className="ml-2">Saving...</span>
               </>
             ) : (
-              "Complete Setup & View Map"
+              "Complete Setup"
             )}
           </button>
         </div>
