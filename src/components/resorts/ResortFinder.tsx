@@ -118,7 +118,7 @@ export default function ResortFinder() {
   };
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
+  if (error) return <div className="text-red-600 text-center p-4 font-medium">{error}</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -126,35 +126,35 @@ export default function ResortFinder() {
       <div className="mb-8 space-y-4">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
             <input
               type="text"
               placeholder="Search resorts by name or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
           >
             <FilterIcon className="w-5 h-5" />
-            Filters
+            <span className="font-medium">Filters</span>
           </button>
           <div className="flex gap-2 border border-gray-300 rounded-lg p-1">
             <button
               onClick={() => setViewMode("list")}
-              className={`px-4 py-1 rounded ${
-                viewMode === "list" ? "bg-blue-500 text-white" : "hover:bg-gray-50"
+              className={`px-4 py-1 rounded font-medium ${
+                viewMode === "list" ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-50"
               }`}
             >
               List
             </button>
             <button
               onClick={() => setViewMode("map")}
-              className={`px-4 py-1 rounded ${
-                viewMode === "map" ? "bg-blue-500 text-white" : "hover:bg-gray-50"
+              className={`px-4 py-1 rounded font-medium ${
+                viewMode === "map" ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-50"
               }`}
             >
               Map
@@ -168,7 +168,7 @@ export default function ResortFinder() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Difficulty Filters */}
               <div>
-                <h3 className="font-semibold mb-2">Difficulty Level</h3>
+                <h3 className="font-semibold mb-2 text-gray-900">Difficulty Level</h3>
                 <div className="space-y-2">
                   {["beginner", "intermediate", "advanced", "expert"].map((level) => (
                     <label key={level} className="flex items-center gap-2">
@@ -178,7 +178,7 @@ export default function ResortFinder() {
                         onChange={() => toggleFilter("difficulty", level as DifficultyLevel)}
                         className="rounded text-blue-500 focus:ring-blue-500"
                       />
-                      <span className="capitalize">{level}</span>
+                      <span className="capitalize text-gray-700 font-medium">{level}</span>
                     </label>
                   ))}
                 </div>
@@ -186,7 +186,7 @@ export default function ResortFinder() {
 
               {/* Amenities Filters */}
               <div>
-                <h3 className="font-semibold mb-2">Amenities</h3>
+                <h3 className="font-semibold mb-2 text-gray-900">Amenities</h3>
                 <div className="space-y-2">
                   {[
                     { id: "nightSkiing", label: "Night Skiing" },
@@ -202,7 +202,7 @@ export default function ResortFinder() {
                         onChange={() => toggleFilter("amenities", id as AmenityType)}
                         className="rounded text-blue-500 focus:ring-blue-500"
                       />
-                      <span>{label}</span>
+                      <span className="text-gray-700 font-medium">{label}</span>
                     </label>
                   ))}
                 </div>

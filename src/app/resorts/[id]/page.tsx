@@ -36,8 +36,8 @@ export default function ResortPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
-  if (!resort) return <div className="text-center p-4">Resort not found</div>;
+  if (error) return <div className="text-red-600 text-center p-4 font-medium">{error}</div>;
+  if (!resort) return <div className="text-gray-900 text-center p-4 font-medium">Resort not found</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -50,10 +50,10 @@ export default function ResortPage({ params }: { params: { id: string } }) {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="absolute bottom-0 left-0 p-8 text-white">
           <h1 className="text-4xl font-bold mb-2">{resort.name}</h1>
-          <div className="flex items-center">
+          <div className="flex items-center text-white/90 font-medium">
             <MapPinIcon className="w-5 h-5 mr-2" />
             <span>{resort.location.address}</span>
           </div>
@@ -66,26 +66,26 @@ export default function ResortPage({ params }: { params: { id: string } }) {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="text-sm text-gray-600">Base Depth</div>
-              <div className="text-2xl font-bold">{resort.weather.snowDepth}″</div>
+              <div className="text-sm font-medium text-gray-700">Base Depth</div>
+              <div className="text-2xl font-bold text-gray-900">{resort.weather.snowDepth}″</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="text-sm text-gray-600">Temperature</div>
-              <div className="text-2xl font-bold">{resort.weather.temperature}°F</div>
+              <div className="text-sm font-medium text-gray-700">Temperature</div>
+              <div className="text-2xl font-bold text-gray-900">{resort.weather.temperature}°F</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="text-sm text-gray-600">Lifts Open</div>
-              <div className="text-2xl font-bold">{resort.stats.numberOfLifts}</div>
+              <div className="text-sm font-medium text-gray-700">Lifts Open</div>
+              <div className="text-2xl font-bold text-gray-900">{resort.stats.numberOfLifts}</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="text-sm text-gray-600">Runs Open</div>
-              <div className="text-2xl font-bold">{resort.stats.numberOfRuns}</div>
+              <div className="text-sm font-medium text-gray-700">Runs Open</div>
+              <div className="text-2xl font-bold text-gray-900">{resort.stats.numberOfRuns}</div>
             </div>
           </div>
 
           {/* Trail Map */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold mb-4">Trail Map</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Trail Map</h2>
             <div className="h-[400px]">
               <ResortMap
                 resorts={[resort]}
@@ -97,14 +97,14 @@ export default function ResortPage({ params }: { params: { id: string } }) {
 
           {/* Trail Difficulty Breakdown */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold mb-4">Trail Difficulty</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Trail Difficulty</h2>
             <div className="space-y-4">
               {(["beginner", "intermediate", "advanced", "expert"] as const).map((level) => (
                 resort.difficulty[level] > 0 && (
                   <div key={level} className="space-y-1">
                     <div className="flex justify-between text-sm">
-                      <span className="capitalize">{level}</span>
-                      <span>{resort.difficulty[level]}%</span>
+                      <span className="capitalize font-medium text-gray-800">{level}</span>
+                      <span className="font-medium text-gray-800">{resort.difficulty[level]}%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
@@ -131,13 +131,13 @@ export default function ResortPage({ params }: { params: { id: string } }) {
         <div className="space-y-6">
           {/* Operating Hours */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold mb-4">Operating Hours</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Operating Hours</h2>
             <div className="space-y-2">
-              <div className="flex items-center">
-                <ClockIcon className="w-5 h-5 mr-2 text-gray-600" />
-                <span>{resort.operatingHours.opening} - {resort.operatingHours.closing}</span>
+              <div className="flex items-center text-gray-800">
+                <ClockIcon className="w-5 h-5 mr-2 text-gray-700" />
+                <span className="font-medium">{resort.operatingHours.opening} - {resort.operatingHours.closing}</span>
               </div>
-              <div className={`text-sm ${resort.operatingHours.isOpen ? "text-green-600" : "text-red-600"}`}>
+              <div className={`text-sm font-medium ${resort.operatingHours.isOpen ? "text-green-700" : "text-red-700"}`}>
                 {resort.operatingHours.isOpen ? "Currently Open" : "Currently Closed"}
               </div>
             </div>
@@ -145,17 +145,17 @@ export default function ResortPage({ params }: { params: { id: string } }) {
 
           {/* Weather */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold mb-4">Current Conditions</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Current Conditions</h2>
             <div className="space-y-4">
-              <div className="flex items-center">
-                <ThermometerIcon className="w-5 h-5 mr-2 text-gray-600" />
-                <span>{resort.weather.temperature}°F</span>
+              <div className="flex items-center text-gray-800">
+                <ThermometerIcon className="w-5 h-5 mr-2 text-gray-700" />
+                <span className="font-medium">{resort.weather.temperature}°F</span>
               </div>
-              <div className="flex items-center">
-                <CloudSnowIcon className="w-5 h-5 mr-2 text-gray-600" />
+              <div className="flex items-center text-gray-800">
+                <CloudSnowIcon className="w-5 h-5 mr-2 text-gray-700" />
                 <div>
-                  <div>{resort.weather.snowDepth}″ Base Depth</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="font-medium">{resort.weather.snowDepth}″ Base Depth</div>
+                  <div className="text-sm font-medium text-gray-700">
                     {resort.weather.snowfall24h}″ Last 24h
                   </div>
                 </div>
@@ -165,26 +165,26 @@ export default function ResortPage({ params }: { params: { id: string } }) {
 
           {/* Stats */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold mb-4">Resort Stats</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Resort Stats</h2>
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Base Elevation</span>
+              <div className="flex justify-between text-gray-800 font-medium">
+                <span>Base Elevation</span>
                 <span>{resort.stats.baseElevation}′</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Peak Elevation</span>
+              <div className="flex justify-between text-gray-800 font-medium">
+                <span>Peak Elevation</span>
                 <span>{resort.stats.peakElevation}′</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Vertical Drop</span>
+              <div className="flex justify-between text-gray-800 font-medium">
+                <span>Vertical Drop</span>
                 <span>{resort.stats.verticalDrop}′</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Lifts</span>
+              <div className="flex justify-between text-gray-800 font-medium">
+                <span>Total Lifts</span>
                 <span>{resort.stats.numberOfLifts}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Runs</span>
+              <div className="flex justify-between text-gray-800 font-medium">
+                <span>Total Runs</span>
                 <span>{resort.stats.numberOfRuns}</span>
               </div>
             </div>
@@ -192,12 +192,12 @@ export default function ResortPage({ params }: { params: { id: string } }) {
 
           {/* Amenities */}
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-xl font-bold mb-4">Amenities</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Amenities</h2>
             <div className="space-y-2">
               {Object.entries(resort.amenities).map(([key, value]) => (
                 <div
                   key={key}
-                  className={`flex items-center ${value ? "text-green-600" : "text-gray-400"}`}
+                  className={`flex items-center ${value ? "text-green-700" : "text-gray-400"} font-medium`}
                 >
                   <span className="mr-2">{value ? "✓" : "×"}</span>
                   <span>{key.replace(/([A-Z])/g, " $1").trim()}</span>

@@ -36,27 +36,27 @@ export default function ResortCard({ resort }: ResortCardProps) {
         />
       </div>
       <div className="p-4">
-        <h3 className="text-xl font-bold mb-2">{resort.name}</h3>
-        <div className="flex items-center text-gray-600 mb-4">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{resort.name}</h3>
+        <div className="flex items-center text-gray-700 mb-4">
           <MapPinIcon className="w-4 h-4 mr-1" />
-          <span className="text-sm">{resort.location.address}</span>
+          <span className="text-sm font-medium">{resort.location.address}</span>
         </div>
 
         {/* Weather Info */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="flex items-center">
-            <ThermometerIcon className="w-4 h-4 mr-1 text-gray-600" />
-            <span>{resort.weather.temperature}°F</span>
+          <div className="flex items-center text-gray-800">
+            <ThermometerIcon className="w-4 h-4 mr-1 text-gray-700" />
+            <span className="font-medium">{resort.weather.temperature}°F</span>
           </div>
-          <div className="flex items-center">
-            <CloudSnowIcon className="w-4 h-4 mr-1 text-gray-600" />
-            <span>{resort.weather.snowDepth}″ Base</span>
+          <div className="flex items-center text-gray-800">
+            <CloudSnowIcon className="w-4 h-4 mr-1 text-gray-700" />
+            <span className="font-medium">{resort.weather.snowDepth}″ Base</span>
           </div>
         </div>
 
         {/* Difficulty Distribution */}
         <div className="mb-4">
-          <div className="text-sm font-medium mb-1">Trail Difficulty</div>
+          <div className="text-sm font-semibold text-gray-900 mb-1">Trail Difficulty</div>
           <div className="flex h-2 rounded-full overflow-hidden">
             {(["beginner", "intermediate", "advanced", "expert"] as const).map((level) => (
               resort.difficulty[level] > 0 && (
@@ -76,7 +76,7 @@ export default function ResortCard({ resort }: ResortCardProps) {
             value && (
               <span
                 key={key}
-                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                className="px-2 py-1 bg-blue-100 text-blue-900 text-xs font-medium rounded-full"
               >
                 {key.replace(/([A-Z])/g, " $1").trim()}
               </span>
@@ -87,7 +87,7 @@ export default function ResortCard({ resort }: ResortCardProps) {
         {/* Action Button */}
         <Link
           href={`/resorts/${resort.id}`}
-          className="block w-full text-center bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          className="block w-full text-center bg-blue-500 text-white font-medium py-2 rounded-lg hover:bg-blue-600 transition-colors"
         >
           View Details
         </Link>
