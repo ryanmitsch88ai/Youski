@@ -7,6 +7,8 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { MapPinIcon, FilterIcon, SearchIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import ResortCard from "./ResortCard";
+import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 
 // Dynamically import the map component to avoid SSR issues
 const ResortMap = dynamic(() => import("./ResortMap"), {
@@ -153,21 +155,23 @@ export default function ResortFinder() {
   if (error) return <div className="text-red-600 text-center p-4 font-medium">{error}</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Search and Filter Header */}
-      <div className="mb-8 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+    <div className="space-y-8">
+      {/* Search Section */}
+      <div className="bg-white/80 dark:bg-dark-card/80 backdrop-blur-lg rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:shadow-xl">
+        <div className="max-w-2xl mx-auto">
+          <div className="relative">
             <input
               type="text"
-              placeholder="Search resorts by name, state, or country..."
+              placeholder="Search resorts..."
+              className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-dark-accent border-2 border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-dark-bg outline-none transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
             />
+            <SearchIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
-          <div className="flex gap-2">
+
+          {/* Filters */}
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2 border rounded-lg font-medium transition-colors ${
@@ -212,118 +216,50 @@ export default function ResortFinder() {
             </div>
           </div>
         </div>
-
-        {/* Filters Panel */}
-        {showFilters && (
-          <div className="p-6 bg-white rounded-lg shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Difficulty Filters */}
-              <div>
-                <h3 className="font-semibold mb-3 text-gray-900">Difficulty Level</h3>
-                <div className="space-y-2">
-                  {["beginner", "intermediate", "advanced", "expert"].map((level) => (
-                    <label key={level} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={filters.difficulty.includes(level as DifficultyLevel)}
-                        onChange={() => toggleFilter("difficulty", level as DifficultyLevel)}
-                        className="rounded text-blue-500 focus:ring-blue-500"
-                      />
-                      <span className="capitalize text-gray-700 font-medium">{level}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Amenities Filters */}
-              <div>
-                <h3 className="font-semibold mb-3 text-gray-900">Amenities</h3>
-                <div className="space-y-2">
-                  {[
-                    { id: "nightSkiing", label: "Night Skiing" },
-                    { id: "rentals", label: "Equipment Rentals" },
-                    { id: "lessons", label: "Ski Lessons" },
-                    { id: "terrain_park", label: "Terrain Park" },
-                    { id: "gondola", label: "Gondola" },
-                  ].map(({ id, label }) => (
-                    <label key={id} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={filters.amenities.includes(id as AmenityType)}
-                        onChange={() => toggleFilter("amenities", id as AmenityType)}
-                        className="rounded text-blue-500 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-700 font-medium">{label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Snow Depth Range */}
-              <div>
-                <h3 className="font-semibold mb-3 text-gray-900">Snow Depth Range</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm text-gray-700 font-medium">Minimum</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="200"
-                      value={filters.snowDepth.min}
-                      onChange={(e) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          snowDepth: { ...prev.snowDepth, min: Number(e.target.value) },
-                        }))
-                      }
-                      className="w-full"
-                    />
-                    <span className="text-sm text-gray-700">{filters.snowDepth.min}″</span>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-700 font-medium">Maximum</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="200"
-                      value={filters.snowDepth.max}
-                      onChange={(e) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          snowDepth: { ...prev.snowDepth, max: Number(e.target.value) },
-                        }))
-                      }
-                      className="w-full"
-                    />
-                    <span className="text-sm text-gray-700">{filters.snowDepth.max}″</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Results Section */}
-      <div className={viewMode === "map" ? "h-[calc(100vh-200px)]" : ""}>
-        {viewMode === "list" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredResorts.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                No resorts found matching your criteria
-              </div>
-            ) : (
-              filteredResorts.map((resort) => <ResortCard key={resort.id} resort={resort} />)
-            )}
-          </div>
-        ) : (
-          <ResortMap
-            resorts={filteredResorts}
-            userLocation={userLocation}
-            center={userLocation || { lat: 39.8283, lng: -98.5795 }}
-          />
-        )}
+      {/* Resorts Grid with Fade In Animation */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredResorts.slice(0, 3).map((resort) => (
+          <motion.div
+            key={resort.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <ResortCard resort={resort} />
+          </motion.div>
+        ))}
       </div>
+
+      {/* Remaining Resorts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+        {filteredResorts.slice(3).map((resort, index) => (
+          <motion.div
+            key={resort.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <ResortCard resort={resort} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Show More Button */}
+      {filteredResorts.length > 3 && (
+        <div className="text-center mt-8">
+          <button
+            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:scale-105"
+          >
+            View More Resorts
+            <ChevronDown className="ml-2 h-5 w-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 } 

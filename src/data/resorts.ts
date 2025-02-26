@@ -43,7 +43,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1544466387-1d5321c24bfd?q=80&w=2574&auto=format&fit=crop",
+    imageUrl: "/resorts/vail-mountain-resort.avif",
     websiteUrl: "https://www.vail.com",
     description: "Vail Mountain Resort is one of the largest ski resorts in North America."
   },
@@ -89,7 +89,7 @@ export const resorts: Resort[] = [
       closing: "3:30 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1544466387-1d5321c24bfd",
+    imageUrl: "/resorts/aspen-snowmass.avif",
     websiteUrl: "https://www.aspensnowmass.com",
     description: "Aspen Snowmass is a world-renowned ski resort featuring four unique mountains."
   },
@@ -135,7 +135,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1548716178-6c0c2ff18329",
+    imageUrl: "/resorts/park-city-mountain-resort.avif",
     websiteUrl: "https://www.parkcitymountain.com",
     description: "Park City Mountain Resort is the largest ski resort in the United States."
   },
@@ -181,7 +181,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1605540436563-5bca919ae766",
+    imageUrl: "/resorts/mammoth-mountain.avif",
     websiteUrl: "https://www.mammothmountain.com",
     description: "Mammoth Mountain is California's highest ski resort."
   },
@@ -227,7 +227,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1547636780-e41778614c28",
+    imageUrl: "/resorts/jackson-hole-mountain-resort.avif",
     websiteUrl: "https://www.jacksonhole.com",
     description: "Jackson Hole Mountain Resort is famous for its steep terrain and deep powder."
   },
@@ -273,7 +273,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1578645510447-e20b4311e3ce",
+    imageUrl: "/resorts/steamboat-ski-resort.avif",
     websiteUrl: "https://www.steamboat.com",
     description: "Steamboat is famous for its Champagne Powder® snow and western hospitality."
   },
@@ -319,7 +319,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1517420879524-86d64ac2f339",
+    imageUrl: "/resorts/killington-resort.avif",
     websiteUrl: "https://www.killington.com",
     description: "Known as 'The Beast of the East,' Killington is the largest ski resort in Eastern North America."
   },
@@ -365,7 +365,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1551524559-8af4e6624178",
+    imageUrl: "/resorts/snowbird.avif",
     websiteUrl: "https://www.snowbird.com",
     description: "Snowbird is known for its deep powder snow and steep terrain."
   },
@@ -411,7 +411,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1605796348246-9e37f54adf69",
+    imageUrl: "/resorts/big-sky-resort.avif",
     websiteUrl: "https://www.bigskyresort.com",
     description: "Big Sky Resort offers the Biggest Skiing in America with 5,850 acres of terrain."
   },
@@ -457,7 +457,7 @@ export const resorts: Resort[] = [
       closing: "4:00 PM",
       isOpen: true
     },
-    imageUrl: "https://images.unsplash.com/photo-1551524559-8af4e6624178",
+    imageUrl: "/resorts/palisades-tahoe.avif",
     websiteUrl: "https://www.palisadestahoe.com",
     description: "Home to the 1960 Winter Olympics, Palisades Tahoe offers world-class terrain across two mountains."
   }

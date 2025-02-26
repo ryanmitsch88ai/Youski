@@ -1,13 +1,10 @@
 import { Suspense } from "react";
-import ResortFinder from "@/components/resorts/ResortFinder";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import HeroSection from "@/components/home/HeroSection";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      <Suspense fallback={<LoadingSpinner />}>
-        <ResortFinder />
-      </Suspense>
+    <main>
+      <HeroSection />
     </main>
   );
 }

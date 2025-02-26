@@ -41,14 +41,24 @@ export default function Navbar() {
 
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <Link
-                  href="/map"
+                  href="/stats"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
-                    isActive('/map')
+                    isActive('/stats')
                       ? 'border-blue-500 text-gray-900 dark:text-white'
                       : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white'
                   }`}
                 >
-                  Map
+                  Stats
+                </Link>
+                <Link
+                  href="/friends"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                    isActive('/friends')
+                      ? 'border-blue-500 text-gray-900 dark:text-white'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white'
+                  }`}
+                >
+                  Friends
                 </Link>
               </div>
             </div>
@@ -80,6 +90,7 @@ export default function Navbar() {
                         src={user.photoURL}
                         alt="Profile"
                         fill
+                        sizes="32px"
                         className="object-cover"
                       />
                     ) : (

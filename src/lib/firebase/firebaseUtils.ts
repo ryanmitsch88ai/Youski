@@ -39,14 +39,27 @@ export interface UserProfile {
   recentTrips?: {
     resortId: string;
     date: string;
+    duration: number;
+    avgSpeed: number;
+    maxSpeed: number;
+    distance: number;
+    vertical: number;
   }[];
   stats?: {
     daysSkied: number;
+    totalVertical: number;
+    totalDistance: number;
     highestAltitude: number;
     longestRun: number;
-    totalVertical: number;
+    maxSpeed: number;
+    avgSpeed: number;
+    totalSessions: number;
   };
-  friends?: string[];
+  friends?: {
+    uid: string;
+    status: 'pending' | 'accepted';
+    since: Date;
+  }[];
   achievements?: string[];
   createdAt: Date;
   updatedAt: Date;
