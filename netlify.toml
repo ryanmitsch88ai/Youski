@@ -4,9 +4,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    framework = "nextjs"
-    useAppDir = true
 
 [build.environment]
   NEXT_PUBLIC_MAPBOX_TOKEN = "pk.eyJ1Ijoicnlhbm1pdHNjaDg4IiwiYSI6ImNtN2wwb3R4ZTAzZXEya29rY3lwZjhsZW0ifQ.OAGyjJZvS1YX1sA3Z0qDDg"
