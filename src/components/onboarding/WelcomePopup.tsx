@@ -14,7 +14,7 @@ export default function WelcomePopup({ onGetStarted, userName }: WelcomePopupPro
         Welcome{userName ? `, ${userName}` : ''}!
       </h1>
       <p className="text-gray-700 text-lg mb-8 leading-relaxed">
-        Let's personalize your skiing experience. We'll ask you a few questions to help find the perfect slopes for you.
+        Let&apos;s personalize your skiing experience. We&apos;ll ask you a few questions to help find the perfect slopes for you.
       </p>
       <button
         onClick={onGetStarted}
