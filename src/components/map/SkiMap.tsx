@@ -1,19 +1,21 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Resort } from '@/types/resort';
+
+interface SkiMapProps {
+  resorts: Resort[];
+  userLocation: { lat: number; lng: number } | null;
+  center: { lat: number; lng: number };
+}
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
-// Example ski resort coordinates (Vail, Colorado)
-const DEFAULT_CENTER: [number, number] = [-106.3741, 39.6403];
-const DEFAULT_ZOOM = 14;
-
-export default function SkiMap() {
+export default function SkiMap({ resorts, userLocation, center }: SkiMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -22,28 +24,28 @@ export default function SkiMap() {
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-v9', // Satellite view works well for ski resorts
-      center: DEFAULT_CENTER,
-      zoom: DEFAULT_ZOOM,
-      pitch: 45, // Tilt the map for better mountain visualization
+      style: 'mapbox://styles/mapbox/satellite-v9',
+      center: [center.lng, center.lat],
+      zoom: 12,
+      pitch: 45,
       bearing: 0,
     });
 
     map.current.on('load', () => {
-      setMapLoaded(true);
+      if (!map.current) return;
       
       // Add terrain layer
-      map.current?.addSource('mapbox-dem', {
+      map.current.addSource('mapbox-dem', {
         'type': 'raster-dem',
         'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
         'tileSize': 512,
         'maxzoom': 14
       });
       
-      map.current?.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+      map.current.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
 
       // Add 3D buildings for the resort
-      map.current?.addLayer({
+      map.current.addLayer({
         'id': 'add-3d-buildings',
         'source': 'composite',
         'source-layer': 'building',
@@ -77,24 +79,59 @@ export default function SkiMap() {
         map.current = null;
       }
     };
-  }, []);
+  }, [center]);
+
+  // Add resort markers
+  useEffect(() => {
+    if (!map.current) return;
+
+    // Remove existing markers
+    const markers = document.getElementsByClassName('mapboxgl-marker');
+    while (markers[0]) {
+      markers[0].remove();
+    }
+
+    // Add resort markers
+    resorts.forEach((resort) => {
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div class="p-4">
+          <h3 class="text-lg font-bold">${resort.name}</h3>
+          <p class="text-sm text-gray-600 mb-2">${resort.location.address}</p>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <span class="font-semibold">Base:</span> ${resort.stats.baseElevation}′
+            </div>
+            <div>
+              <span class="font-semibold">Peak:</span> ${resort.stats.peakElevation}′
+            </div>
+            <div>
+              <span class="font-semibold">Runs:</span> ${resort.stats.numberOfRuns}
+            </div>
+            <div>
+              <span class="font-semibold">Snow:</span> ${resort.weather.snowDepth}″
+            </div>
+          </div>
+        </div>
+      `);
+
+      new mapboxgl.Marker({ color: '#dc2626' })
+        .setLngLat([resort.location.lng, resort.location.lat])
+        .setPopup(popup)
+        .addTo(map.current!);
+    });
+
+    // Add user location marker if available
+    if (userLocation) {
+      new mapboxgl.Marker({ color: '#2563eb' })
+        .setLngLat([userLocation.lng, userLocation.lat])
+        .setPopup(new mapboxgl.Popup().setHTML('<h3 class="font-bold">Your Location</h3>'))
+        .addTo(map.current);
+    }
+  }, [resorts, userLocation]);
 
   return (
-    <div className="relative w-full h-[calc(100vh-64px)]">
-      <div ref={mapContainer} className="absolute inset-0" />
-      {!mapLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <div className="text-lg font-semibold text-gray-600">Loading map...</div>
-        </div>
-      )}
-      <div className="absolute top-4 left-4 z-10 bg-white p-4 rounded-lg shadow-lg">
-        <h2 className="text-lg font-semibold mb-2">Vail Mountain</h2>
-        <div className="text-sm text-gray-600">
-          <div>Elevation: 11,570 ft</div>
-          <div>Open Runs: 195/195</div>
-          <div>Snow Conditions: Powder</div>
-        </div>
-      </div>
+    <div className="relative w-full h-full">
+      <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
     </div>
   );
 } 

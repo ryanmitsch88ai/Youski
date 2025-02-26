@@ -6,16 +6,20 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { MapPinIcon, FilterIcon, SearchIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import ResortCard from "./ResortCard";
 
 // Dynamically import the map component to avoid SSR issues
-const ResortMap = dynamic(() => import("./ResortMap"), {
+const ResortMap = dynamic(() => import("@/components/map/SkiMap"), {
   ssr: false,
   loading: () => <LoadingSpinner />
 });
 
+type DifficultyLevel = "beginner" | "intermediate" | "advanced" | "expert";
+type AmenityType = "nightSkiing" | "rentals" | "lessons" | "terrain_park" | "gondola";
+
 interface Filters {
-  difficulty: ("beginner" | "intermediate" | "advanced" | "expert")[];
-  amenities: ("nightSkiing" | "rentals" | "lessons" | "terrain_park" | "gondola")[];
+  difficulty: DifficultyLevel[];
+  amenities: AmenityType[];
   maxDistance?: number;
 }
 
@@ -101,13 +105,16 @@ export default function ResortFinder() {
     }
   };
 
-  const toggleFilter = (type: keyof Filters, value: any) => {
-    setFilters((prev) => ({
-      ...prev,
-      [type]: prev[type].includes(value)
-        ? prev[type].filter((item) => item !== value)
-        : [...prev[type], value],
-    }));
+  const toggleFilter = (type: keyof Filters, value: DifficultyLevel | AmenityType) => {
+    setFilters((prev) => {
+      const currentArray = prev[type] as (DifficultyLevel | AmenityType)[];
+      return {
+        ...prev,
+        [type]: currentArray.includes(value)
+          ? currentArray.filter((item) => item !== value)
+          : [...currentArray, value],
+      };
+    });
   };
 
   if (loading) return <LoadingSpinner />;
@@ -167,8 +174,8 @@ export default function ResortFinder() {
                     <label key={level} className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={filters.difficulty.includes(level)}
-                        onChange={() => toggleFilter("difficulty", level)}
+                        checked={filters.difficulty.includes(level as DifficultyLevel)}
+                        onChange={() => toggleFilter("difficulty", level as DifficultyLevel)}
                         className="rounded text-blue-500 focus:ring-blue-500"
                       />
                       <span className="capitalize">{level}</span>
@@ -191,8 +198,8 @@ export default function ResortFinder() {
                     <label key={id} className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={filters.amenities.includes(id)}
-                        onChange={() => toggleFilter("amenities", id)}
+                        checked={filters.amenities.includes(id as AmenityType)}
+                        onChange={() => toggleFilter("amenities", id as AmenityType)}
                         className="rounded text-blue-500 focus:ring-blue-500"
                       />
                       <span>{label}</span>
