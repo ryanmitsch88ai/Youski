@@ -2,14 +2,16 @@
 
 import { Resort } from "@/types/resort";
 import Image from "next/image";
-import Link from "next/link";
-import { MapPinIcon, ThermometerIcon, CloudSnowIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MapPinIcon, CloudSnowIcon, ThermometerIcon, CloudIcon, SunIcon, CloudRainIcon } from "lucide-react";
 
 interface ResortCardProps {
   resort: Resort;
 }
 
 export default function ResortCard({ resort }: ResortCardProps) {
+  const router = useRouter();
+
   const getDifficultyColor = (level: keyof Resort["difficulty"]) => {
     switch (level) {
       case "beginner":
@@ -25,15 +27,36 @@ export default function ResortCard({ resort }: ResortCardProps) {
     }
   };
 
+  const getWeatherIcon = (condition: string) => {
+    switch (condition.toLowerCase()) {
+      case "sunny":
+        return <SunIcon className="w-4 h-4 text-yellow-500" />;
+      case "cloudy":
+        return <CloudIcon className="w-4 h-4 text-gray-500" />;
+      case "snowing":
+        return <CloudSnowIcon className="w-4 h-4 text-blue-500" />;
+      case "raining":
+        return <CloudRainIcon className="w-4 h-4 text-blue-400" />;
+      default:
+        return <CloudIcon className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+    <div 
+      onClick={() => router.push(`/resorts/${resort.id}`)}
+      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer transform hover:scale-[1.02] active:scale-[0.98]"
+    >
       <div className="relative h-48">
         <Image
           src={resort.imageUrl}
           alt={resort.name}
           fill
           className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
       <div className="p-4">
         <h3 className="text-xl font-bold text-gray-900 mb-2">{resort.name}</h3>
@@ -48,7 +71,8 @@ export default function ResortCard({ resort }: ResortCardProps) {
             <ThermometerIcon className="w-4 h-4 mr-1 text-gray-700" />
             <span className="font-medium">{resort.weather.temperature}°F</span>
           </div>
-          <div className="flex items-center text-gray-800">
+          <div className="flex items-center gap-1 text-gray-800">
+            {getWeatherIcon(resort.weather.condition)}
             <CloudSnowIcon className="w-4 h-4 mr-1 text-gray-700" />
             <span className="font-medium">{resort.weather.snowDepth}″ Base</span>
           </div>
@@ -71,7 +95,7 @@ export default function ResortCard({ resort }: ResortCardProps) {
         </div>
 
         {/* Amenities */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2">
           {Object.entries(resort.amenities).map(([key, value]) => (
             value && (
               <span
@@ -83,14 +107,6 @@ export default function ResortCard({ resort }: ResortCardProps) {
             )
           ))}
         </div>
-
-        {/* Action Button */}
-        <Link
-          href={`/resorts/${resort.id}`}
-          className="block w-full text-center bg-blue-500 text-white font-medium py-2 rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          View Details
-        </Link>
       </div>
     </div>
   );
