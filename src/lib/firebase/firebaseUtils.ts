@@ -3,6 +3,8 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from "firebase/auth";
 import {
   collection,
@@ -19,6 +21,9 @@ import {
 export const logoutUser = () => firebaseSignOut(auth);
 
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 export interface UserProfile {
   uid: string;
@@ -34,31 +39,56 @@ export interface UserProfile {
 
 export const signInWithGoogle = async () => {
   try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const { user } = result;
-    
-    // Check if user profile exists
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    
-    if (!userDoc.exists()) {
-      // Create new user profile
-      const newUser: Partial<UserProfile> = {
-        uid: user.uid,
-        email: user.email || '',
-        displayName: user.displayName || '',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      await setDoc(doc(db, 'users', user.uid), newUser);
+    // Try popup first
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      await handleAuthResult(result);
+      return result.user;
+    } catch (popupError) {
+      console.log('Popup failed, trying redirect...', popupError);
+      // If popup fails, fall back to redirect
+      await signInWithRedirect(auth, googleProvider);
     }
-    
-    return user;
   } catch (error) {
     console.error('Error signing in with Google:', error);
     throw error;
   }
 };
+
+// Handle the redirect result
+export const handleRedirectResult = async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      await handleAuthResult(result);
+      return result.user;
+    }
+  } catch (error) {
+    console.error('Error handling redirect result:', error);
+    throw error;
+  }
+};
+
+// Helper function to handle auth result
+async function handleAuthResult(result: any) {
+  const { user } = result;
+  
+  // Check if user profile exists
+  const userDoc = await getDoc(doc(db, 'users', user.uid));
+  
+  if (!userDoc.exists()) {
+    // Create new user profile
+    const newUser: Partial<UserProfile> = {
+      uid: user.uid,
+      email: user.email || '',
+      displayName: user.displayName || '',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    await setDoc(doc(db, 'users', user.uid), newUser);
+  }
+}
 
 // Firestore functions
 export const addDocument = (collectionName: string, data: any) =>

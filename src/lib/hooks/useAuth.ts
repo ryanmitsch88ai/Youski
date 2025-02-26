@@ -14,9 +14,19 @@ export function useAuth() {
 
   const login = async () => {
     try {
-      await signInWithGoogle();
+      console.log('Starting Google sign-in process...');
+      const result = await signInWithGoogle();
+      console.log('Sign-in successful:', result);
+      return result;
     } catch (error) {
-      console.error('Error logging in:', error);
+      console.error('Error during login:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        });
+      }
       throw error;
     }
   };

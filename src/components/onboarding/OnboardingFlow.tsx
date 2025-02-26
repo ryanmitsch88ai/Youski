@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
 type TerrainPreference = "groomed" | "powder" | "park" | "backcountry";
@@ -24,6 +25,8 @@ export default function OnboardingFlow() {
   const { user, loading, login, updateProfile } = useAuth();
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const updateProfileData = async (key: keyof UserProfile, value: any) => {
     const newProfile = { ...profile, [key]: value };
@@ -39,8 +42,23 @@ export default function OnboardingFlow() {
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      setIsLoggingIn(true);
+      setError(null);
+      console.log('Starting login process...');
+      await login();
+      console.log('Login completed successfully');
+    } catch (error) {
+      console.error('Login failed:', error);
+      setError(error instanceof Error ? error.message : 'Failed to sign in with Google');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   if (loading) {
-    return <div className="text-center">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (!user) {
@@ -50,11 +68,24 @@ export default function OnboardingFlow() {
         <p className="text-gray-600 text-center mb-6">
           Please sign in to create your personalized skiing experience
         </p>
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
         <button
-          onClick={login}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+          onClick={handleLogin}
+          disabled={isLoggingIn}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:bg-blue-300"
         >
-          Sign In with Google
+          {isLoggingIn ? (
+            <span className="flex items-center justify-center">
+              <LoadingSpinner />
+              <span className="ml-2">Signing in...</span>
+            </span>
+          ) : (
+            "Sign In with Google"
+          )}
         </button>
       </div>
     );
