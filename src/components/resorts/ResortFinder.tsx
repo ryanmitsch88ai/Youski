@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import ResortCard from "./ResortCard";
 
 // Dynamically import the map component to avoid SSR issues
-const ResortMap = dynamic(() => import("@/components/map/SkiMap"), {
+const ResortMap = dynamic(() => import("./ResortMap"), {
   ssr: false,
   loading: () => <LoadingSpinner />
 });
@@ -213,7 +213,7 @@ export default function ResortFinder() {
       </div>
 
       {/* Results Section */}
-      <div className={viewMode === "map" ? "h-[calc(100vh-300px)]" : ""}>
+      <div className={viewMode === "map" ? "h-[calc(100vh-200px)]" : ""}>
         {viewMode === "list" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResorts.map((resort) => (
