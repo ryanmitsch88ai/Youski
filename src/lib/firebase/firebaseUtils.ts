@@ -29,10 +29,24 @@ export interface UserProfile {
   uid: string;
   email: string;
   displayName: string;
+  photoURL?: string;
   skillLevel: "beginner" | "intermediate" | "advanced" | "expert";
   preferences: string[];
   timeAvailability: "half-day" | "full-day" | "custom";
   customHours?: { start: string; end: string };
+  goals?: string[];
+  favoriteResorts?: string[];
+  recentTrips?: {
+    resortId: string;
+    date: string;
+  }[];
+  stats?: {
+    daysSkied: number;
+    highestAltitude: number;
+    longestRun: number;
+    totalVertical: number;
+  };
+  friends?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
