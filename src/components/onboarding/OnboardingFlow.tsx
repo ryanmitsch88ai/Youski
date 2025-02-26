@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useRouter } from "next/navigation";
+import WelcomePopup from "./WelcomePopup";
 
 type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
 type TerrainPreference = "groomed" | "powder" | "park" | "backcountry";
@@ -25,11 +26,17 @@ const defaultProfile: UserProfile = {
 export default function OnboardingFlow() {
   const router = useRouter();
   const { user, loading, login, updateProfile } = useAuth();
-  const [step, setStep] = useState(1);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [step, setStep] = useState(0); // Changed to start at 0 for welcome state
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleGetStarted = () => {
+    setShowOnboarding(true);
+    setStep(1);
+  };
 
   const updateProfileData = async (key: keyof UserProfile, value: any) => {
     const newProfile = { ...profile, [key]: value };
@@ -38,7 +45,7 @@ export default function OnboardingFlow() {
     if (user && step === 3) {
       try {
         await updateProfile(newProfile);
-        // TODO: Navigate to main app
+        // Will handle navigation in handleComplete
       } catch (error) {
         console.error('Error updating profile:', error);
       }
@@ -105,6 +112,15 @@ export default function OnboardingFlow() {
           )}
         </button>
       </div>
+    );
+  }
+
+  if (!showOnboarding && step === 0) {
+    return (
+      <WelcomePopup
+        onGetStarted={handleGetStarted}
+        userName={user.displayName?.split(' ')[0]}
+      />
     );
   }
 
