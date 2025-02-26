@@ -38,3 +38,6 @@ next-env.d.ts
 # environment and configuration
 .env
 netlify.toml
+
+# Local Netlify folder
+.netlify

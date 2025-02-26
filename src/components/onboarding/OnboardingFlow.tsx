@@ -64,8 +64,8 @@ export default function OnboardingFlow() {
   if (!user) {
     return (
       <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
-        <h1 className="text-2xl font-bold text-center mb-6">Welcome to You Ski</h1>
-        <p className="text-gray-600 text-center mb-6">
+        <h1 className="text-2xl font-bold text-center mb-6 text-black">Welcome to You Ski</h1>
+        <p className="text-gray-700 text-center mb-6">
           Please sign in to create your personalized skiing experience
         </p>
         {error && (
@@ -104,7 +104,7 @@ export default function OnboardingFlow() {
             />
           ))}
         </div>
-        <h2 className="text-xl font-semibold text-center">
+        <h2 className="text-xl font-semibold text-center text-black">
           {step === 1 && "What's your skill level?"}
           {step === 2 && "What type of terrain do you prefer?"}
           {step === 3 && "How long do you typically ski?"}
@@ -122,8 +122,8 @@ export default function OnboardingFlow() {
               }}
               className={`p-4 rounded-lg border-2 ${
                 profile.skillLevel === level
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-blue-500 bg-blue-50 text-black"
+                  : "border-gray-200 hover:border-blue-300 text-black"
               }`}
             >
               <div className="font-semibold capitalize">{level}</div>
@@ -145,8 +145,8 @@ export default function OnboardingFlow() {
               }}
               className={`p-4 rounded-lg border-2 ${
                 profile.preferences.includes(terrain)
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-blue-500 bg-blue-50 text-black"
+                  : "border-gray-200 hover:border-blue-300 text-black"
               }`}
             >
               <div className="font-semibold capitalize">{terrain}</div>
@@ -174,8 +174,8 @@ export default function OnboardingFlow() {
               }}
               className={`w-full p-4 rounded-lg border-2 ${
                 profile.timeAvailability === time
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-blue-500 bg-blue-50 text-black"
+                  : "border-gray-200 hover:border-blue-300 text-black"
               }`}
             >
               <div className="font-semibold capitalize">{time.replace("-", " ")}</div>
