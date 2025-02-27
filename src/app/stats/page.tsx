@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { Line, Bar, HeatMap } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,6 +32,29 @@ ChartJS.register(
   Filler
 );
 
+// Types for ski data
+interface DaySkied {
+  date: string;
+  count: number;
+}
+
+interface ResortVisit {
+  resort: string;
+  visits: number;
+}
+
+interface SessionStat {
+  date: string;
+  duration: number;
+  avgSpeed: number;
+}
+
+interface SkiData {
+  daysSkied: DaySkied[];
+  resortHeatmap: ResortVisit[];
+  sessionStats: SessionStat[];
+}
+
 // Dynamic import of components that need to be client-side only
 const StatsCard = dynamic(() => import('@/components/stats/StatsCard'), {
   ssr: false,
@@ -51,7 +74,7 @@ const AchievementsCard = dynamic(() => import('@/components/stats/AchievementsCa
 export default function StatsPage() {
   const { user, userProfile } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [skiData, setSkiData] = useState({
+  const [skiData, setSkiData] = useState<SkiData>({
     daysSkied: [],
     resortHeatmap: [],
     sessionStats: []
