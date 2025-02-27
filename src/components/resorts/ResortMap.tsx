@@ -15,6 +15,10 @@ interface TrailMapData {
   metadata: {
     width: number;
     height: number;
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
   };
 }
 
@@ -29,56 +33,14 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 export default function ResortMap({ resorts, userLocation, center }: ResortMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [showTrailMap, setShowTrailMap] = useState(true);
-  const [trailMapData, setTrailMapData] = useState<TrailMapData | null>(null);
+  const [selectedResort, setSelectedResort] = useState<string | null>(null);
+  const [trailMap, setTrailMap] = useState<TrailMapData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [zoom, setZoom] = useState(1);
 
-  // Fetch trail map data when a single resort is selected
+  // Initialize the map
   useEffect(() => {
-    if (resorts.length !== 1) {
-      setTrailMapData(null);
-      return;
-    }
-
-    const fetchTrailMap = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        console.log("Fetching trail map for resort:", resorts[0].id);
-        const response = await fetch(`/api/trail-maps?resortId=${resorts[0].id}`);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Trail map fetch error:", {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorText
-          });
-          throw new Error(errorText || "Failed to fetch trail map");
-        }
-
-        const data = await response.json();
-        console.log("Trail map data received:", data);
-        setTrailMapData(data);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Failed to load trail map";
-        console.error("Error in fetchTrailMap:", err);
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (showTrailMap) {
-      fetchTrailMap();
-    }
-  }, [resorts, showTrailMap]);
-
-  // Initialize the location map
-  useEffect(() => {
-    if (!mapContainer.current || map.current || showTrailMap) return;
+    if (!mapContainer.current || map.current) return;
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
     
@@ -86,17 +48,94 @@ export default function ResortMap({ resorts, userLocation, center }: ResortMapPr
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/outdoors-v12",
       center: [center.lng, center.lat],
-      zoom: 5,
+      zoom: 12,
+      pitch: 60,
+      bearing: 0,
+      maxPitch: 85,
+      antialias: true
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+    map.current.on("load", () => {
+      if (!map.current) return;
+      
+      // Add terrain source
+      map.current.addSource("mapbox-dem", {
+        "type": "raster-dem",
+        "url": "mapbox://mapbox.mapbox-terrain-dem-v1",
+        "tileSize": 512,
+        "maxzoom": 14
+      });
+      
+      // Add sky layer
+      map.current.addLayer({
+        'id': 'sky',
+        'type': 'sky',
+        'paint': {
+          'sky-type': 'atmosphere',
+          'sky-atmosphere-sun': [0.0, 90.0],
+          'sky-atmosphere-sun-intensity': 15
+        }
+      });
 
-    if (userLocation) {
-      new mapboxgl.Marker({ color: "#0000FF" })
-        .setLngLat([userLocation.lng, userLocation.lat])
-        .setPopup(new mapboxgl.Popup().setHTML("<h3>Your Location</h3>"))
-        .addTo(map.current);
-    }
+      // Set terrain configuration
+      map.current.setTerrain({
+        "source": "mapbox-dem",
+        "exaggeration": 1.5
+      });
+
+      // Add satellite layer
+      map.current.addSource('satellite', {
+        'type': 'raster',
+        'url': 'mapbox://mapbox.satellite',
+        'tileSize': 256,
+        'maxzoom': 22
+      });
+
+      map.current.addLayer({
+        'id': 'satellite',
+        'type': 'raster',
+        'source': 'satellite',
+        'layout': {
+          'visibility': 'visible'
+        },
+        'paint': {
+          'raster-opacity': 0.5
+        }
+      }, 'land-structure-polygon');
+
+      // Add 3D buildings
+      map.current.addLayer({
+        'id': 'add-3d-buildings',
+        'source': 'composite',
+        'source-layer': 'building',
+        'filter': ['==', 'extrude', 'true'],
+        'type': 'fill-extrusion',
+        'minzoom': 15,
+        'paint': {
+          'fill-extrusion-color': '#aaa',
+          'fill-extrusion-height': ['get', 'height'],
+          'fill-extrusion-base': ['get', 'min_height'],
+          'fill-extrusion-opacity': 0.6
+        }
+      });
+    });
+
+    // Add navigation controls with visualization options
+    const nav = new mapboxgl.NavigationControl({
+      visualizePitch: true,
+      showZoom: true,
+      showCompass: true
+    });
+    map.current.addControl(nav, 'top-right');
+    
+    // Add geolocation control
+    map.current.addControl(new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true
+      },
+      trackUserLocation: true,
+      showUserHeading: true
+    }));
 
     return () => {
       if (map.current) {
@@ -104,175 +143,123 @@ export default function ResortMap({ resorts, userLocation, center }: ResortMapPr
         map.current = null;
       }
     };
-  }, [center, userLocation, showTrailMap]);
+  }, [center]);
 
-  // Update location map markers
+  // Add resort markers and handle resort selection
   useEffect(() => {
-    if (!map.current || showTrailMap) return;
+    if (!map.current) return;
 
+    // Remove existing markers
     const markers = document.getElementsByClassName("mapboxgl-marker");
     while (markers[0]) {
       markers[0].remove();
     }
 
+    // Add resort markers
     resorts.forEach((resort) => {
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div class="p-2">
-          <h3 class="font-bold">${resort.name}</h3>
-          <p class="text-sm text-gray-600">${resort.location.address}</p>
-          <div class="mt-2">
-            <p class="text-sm">
+        <div class="p-4">
+          <h3 class="text-lg font-bold">${resort.name}</h3>
+          <p class="text-sm text-gray-600 mb-2">${resort.location.address}</p>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <span class="font-semibold">Base:</span> ${resort.stats.baseElevation}′
+            </div>
+            <div>
+              <span class="font-semibold">Peak:</span> ${resort.stats.peakElevation}′
+            </div>
+            <div>
+              <span class="font-semibold">Runs:</span> ${resort.stats.numberOfRuns}
+            </div>
+            <div>
               <span class="font-semibold">Snow:</span> ${resort.weather.snowDepth}″
-            </p>
-            <p class="text-sm">
-              <span class="font-semibold">Temp:</span> ${resort.weather.temperature}°F
-            </p>
+            </div>
           </div>
+          <button 
+            class="mt-3 w-full px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            onclick="window.selectResort('${resort.id}')"
+          >
+            View Trail Map
+          </button>
         </div>
       `);
 
-      new mapboxgl.Marker({ color: "#FF0000" })
+      const marker = new mapboxgl.Marker({ color: "#dc2626" })
         .setLngLat([resort.location.lng, resort.location.lat])
         .setPopup(popup)
         .addTo(map.current!);
-    });
-  }, [resorts, showTrailMap]);
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.5, 4));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.5, 0.5));
-  const handleResetZoom = () => setZoom(1);
+      marker.getElement().addEventListener("click", () => {
+        setSelectedResort(resort.id);
+      });
+    });
+
+    // Add user location marker if available
+    if (userLocation) {
+      new mapboxgl.Marker({ color: "#2563eb" })
+        .setLngLat([userLocation.lng, userLocation.lat])
+        .setPopup(new mapboxgl.Popup().setHTML("<h3 class='font-bold'>Your Location</h3>"))
+        .addTo(map.current);
+    }
+
+    // Add global function for marker button click
+    (window as any).selectResort = (resortId: string) => {
+      setSelectedResort(resortId);
+    };
+  }, [resorts, userLocation]);
+
+  // Fetch and display trail map when resort is selected
+  useEffect(() => {
+    if (!selectedResort || !map.current) return;
+
+    const fetchTrailMap = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`/api/trail-maps?resortId=${selectedResort}`);
+        if (!response.ok) throw new Error("Failed to fetch trail map");
+        
+        const data = await response.json();
+        setTrailMap(data);
+
+        // Update map view to trail map position
+        map.current?.flyTo({
+          center: data.metadata.center,
+          zoom: data.metadata.zoom,
+          bearing: data.metadata.bearing,
+          pitch: data.metadata.pitch,
+          duration: 2000
+        });
+
+      } catch (err) {
+        console.error("Error fetching trail map:", err);
+        setError(err instanceof Error ? err.message : "Failed to load trail map");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrailMap();
+  }, [selectedResort]);
 
   return (
     <div className="relative w-full h-full">
-      {/* Map Type Toggle */}
-      <div className="absolute top-4 left-4 z-10 bg-white dark:bg-dark-card rounded-lg shadow-lg p-2">
-        <div className="flex gap-2">
-          <button
-            id="trail-map-toggle"
-            name="trail-map-toggle"
-            onClick={() => setShowTrailMap(true)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
-              showTrailMap
-                ? "bg-blue-500 text-white"
-                : "hover:bg-gray-100 dark:hover:bg-gray-800"
-            }`}
-          >
-            <Mountain className="w-4 h-4" />
-            <span className="text-sm font-medium">Trail Map</span>
-          </button>
-          <button
-            id="location-map-toggle"
-            name="location-map-toggle"
-            onClick={() => setShowTrailMap(false)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
-              !showTrailMap
-                ? "bg-blue-500 text-white"
-                : "hover:bg-gray-100 dark:hover:bg-gray-800"
-            }`}
-          >
-            <Map className="w-4 h-4" />
-            <span className="text-sm font-medium">Location</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Trail Map View */}
-      {showTrailMap && (
-        <div className="relative w-full h-full">
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
-            {loading ? (
-              <LoadingSpinner />
-            ) : error ? (
-              <div className="text-center p-8">
-                <p className="text-red-500 dark:text-red-400">{error}</p>
-                <button
-                  id="view-location-fallback"
-                  name="view-location-fallback"
-                  onClick={() => setShowTrailMap(false)}
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-                >
-                  View Location Map Instead
-                </button>
-              </div>
-            ) : resorts.length === 1 && trailMapData ? (
-              <div className="relative w-full h-full overflow-hidden">
-                <div 
-                  className="absolute inset-0 transition-transform duration-200 ease-out"
-                  style={{
-                    transform: `scale(${zoom})`,
-                    transformOrigin: 'center'
-                  }}
-                >
-                  <Image
-                    src={trailMapData.url}
-                    alt={`${trailMapData.name} trail map`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                    className="object-contain"
-                    quality={100}
-                    priority
-                    onError={(e) => {
-                      console.error("Image load error:", e);
-                      const target = e.target as HTMLImageElement;
-                      setError("Failed to load trail map image");
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="text-center p-8">
-                <Mountain className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 dark:text-gray-400">
-                  Select a resort to view its trail map
-                </p>
-              </div>
-            )}
-          </div>
+      <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
+      
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm rounded-lg">
+          <LoadingSpinner />
         </div>
       )}
 
-      {/* Trail Map Controls */}
-      {showTrailMap && trailMapData && !loading && !error && (
-        <div className="absolute top-4 right-4 z-10 bg-white dark:bg-dark-card rounded-lg shadow-lg p-2">
-          <div className="flex gap-2">
-            <button
-              id="zoom-in"
-              name="zoom-in"
-              onClick={handleZoomIn}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-              title="Zoom In"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </button>
-            <button
-              id="zoom-out"
-              name="zoom-out"
-              onClick={handleZoomOut}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-              title="Zoom Out"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </button>
-            <button
-              id="zoom-reset"
-              name="zoom-reset"
-              onClick={handleResetZoom}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-              title="Reset Zoom"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm rounded-lg">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <p className="text-red-500">{error}</p>
           </div>
         </div>
       )}
-
-      {/* Location Map View */}
-      <div 
-        ref={mapContainer} 
-        className={`w-full h-full rounded-lg transition-opacity duration-300 ${
-          showTrailMap ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`} 
-      />
     </div>
   );
 } 

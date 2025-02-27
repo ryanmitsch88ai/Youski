@@ -1,18 +1,69 @@
 import { NextResponse } from "next/server";
 
-const SKIMAP_API_BASE = "https://skimap.org/SkiAreas/view";
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-const RESORT_MAP_IDS: { [key: string]: number } = {
-  "vail": 510,           // Vail
-  "aspen": 505,          // Aspen Snowmass
-  "park-city": 224,      // Park City
-  "mammoth": 480,        // Mammoth Mountain
-  "jackson-hole": 1025,  // Jackson Hole
-  "steamboat": 946,      // Steamboat
-  "killington": 235,     // Killington
-  "snowbird": 47,        // Snowbird
-  "big-sky": 257,        // Big Sky
-  "palisades-tahoe": 542 // Palisades Tahoe (formerly Squaw Valley)
+// These coordinates and zoom levels are optimized for trail map views
+const RESORT_CONFIGS: { [key: string]: { center: [number, number], zoom: number, bearing: number, pitch: number } } = {
+  "vail": {
+    center: [-106.3741, 39.6061],
+    zoom: 13.5,
+    bearing: 25,
+    pitch: 75
+  },
+  "aspen": {
+    center: [-106.8317, 39.1911],
+    zoom: 13.5,
+    bearing: 15,
+    pitch: 75
+  },
+  "park-city": {
+    center: [-111.5089, 40.6514],
+    zoom: 13.5,
+    bearing: 45,
+    pitch: 75
+  },
+  "mammoth": {
+    center: [-119.0326, 37.6308],
+    zoom: 13.5,
+    bearing: -15,
+    pitch: 75
+  },
+  "jackson-hole": {
+    center: [-110.8279, 43.5875],
+    zoom: 13.5,
+    bearing: 30,
+    pitch: 75
+  },
+  "steamboat": {
+    center: [-106.8045, 40.4572],
+    zoom: 13.5,
+    bearing: -25,
+    pitch: 75
+  },
+  "killington": {
+    center: [-72.8030, 43.6045],
+    zoom: 13.5,
+    bearing: 15,
+    pitch: 75
+  },
+  "snowbird": {
+    center: [-111.6564, 40.5829],
+    zoom: 13.5,
+    bearing: -15,
+    pitch: 75
+  },
+  "big-sky": {
+    center: [-111.4018, 45.2862],
+    zoom: 13.5,
+    bearing: 30,
+    pitch: 75
+  },
+  "palisades-tahoe": {
+    center: [-120.2377, 39.1967],
+    zoom: 13.5,
+    bearing: 45,
+    pitch: 75
+  }
 };
 
 export async function GET(request: Request) {
@@ -21,70 +72,50 @@ export async function GET(request: Request) {
 
   console.log("Fetching trail map for resort:", resortId);
 
-  if (!resortId || !RESORT_MAP_IDS[resortId]) {
+  if (!resortId || !RESORT_CONFIGS[resortId]) {
     console.error("Invalid resort ID:", resortId);
     return new NextResponse("Resort ID not found", { status: 404 });
   }
 
   try {
-    // First, get the resort data from Skimap.org
-    const skimapId = RESORT_MAP_IDS[resortId];
-    console.log("Fetching from Skimap.org ID:", skimapId);
+    const config = RESORT_CONFIGS[resortId];
     
-    // Try HTML format first since Skimap.org seems to prefer it
-    const response = await fetch(`${SKIMAP_API_BASE}/${skimapId}`, {
-      headers: {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (compatible; YouSkiBot/1.0)'
-      }
-    });
+    // Construct Mapbox Static Image URL with winter style and terrain
+    const width = 1200;
+    const height = 800;
+    const style = 'mapbox://styles/mapbox/outdoors-v12'; // Changed to outdoors style
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Skimap.org API error:", {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-        error: errorText
-      });
-      throw new Error(`Failed to fetch resort data: ${response.statusText}\n${errorText}`);
-    }
-    
-    const htmlText = await response.text();
-    
-    // Extract image ID from HTML response using regex
-    const imageMatch = htmlText.match(/\/data\/image\/(\d+)/);
-    if (!imageMatch) {
-      throw new Error("No trail map image found in response");
-    }
-    
-    const imageId = imageMatch[1];
-    const imageUrl = `https://skimap.org/data/image/${imageId}.jpg`;
-    
-    // Extract resort name
-    const nameMatch = htmlText.match(/<title>([^<]+)<\/title>/);
-    const resortName = nameMatch ? nameMatch[1].replace(" | Skimap.org", "") : "Unknown Resort";
-    
-    console.log("Extracted map data:", {
-      imageId,
-      resortName,
-      url: imageUrl
+    const imageUrl = `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/${
+      config.center[0]},${config.center[1]},${
+      config.zoom},${config.bearing},${config.pitch}/${
+      width}x${height}@2x?access_token=${MAPBOX_TOKEN}&logo=false`;
+
+    console.log("Generated Mapbox URL for resort:", {
+      resortId,
+      center: config.center,
+      zoom: config.zoom,
+      bearing: config.bearing,
+      pitch: config.pitch
     });
 
-    // Return the trail map data
     return NextResponse.json({
-      id: imageId,
-      name: resortName,
+      id: resortId,
+      name: resortId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
       url: imageUrl,
       metadata: {
-        width: 1200,  // Default size, actual size will be determined by the image
-        height: 800
+        width,
+        height,
+        center: config.center,
+        zoom: config.zoom,
+        bearing: config.bearing,
+        pitch: config.pitch
       }
     });
+
   } catch (error) {
-    console.error("Error fetching trail map:", error);
+    console.error("Error generating trail map URL:", error);
     return new NextResponse(
-      error instanceof Error ? error.message : "Error fetching trail map", 
+      error instanceof Error ? error.message : "Error generating trail map URL", 
       { status: 500 }
     );
   }

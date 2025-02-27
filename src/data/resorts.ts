@@ -5,17 +5,17 @@ export const resorts: Resort[] = [
     id: "vail",
     name: "Vail Mountain Resort",
     location: {
-      lat: 39.6403,
-      lng: -106.3742,
-      address: "Vail, Colorado 81657",
+      lat: 39.6061,
+      lng: -106.3741,
+      address: "Vail, Colorado",
       state: "Colorado",
       country: "USA"
     },
     difficulty: {
       beginner: 18,
       intermediate: 29,
-      advanced: 30,
-      expert: 23
+      advanced: 53,
+      expert: 0
     },
     amenities: {
       nightSkiing: false,
@@ -36,32 +36,32 @@ export const resorts: Resort[] = [
       condition: "Sunny",
       snowfall24h: 0,
       snowDepth: 45,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: "2024-02-20T08:00:00Z"
     },
     operatingHours: {
-      opening: "8:30 AM",
-      closing: "4:00 PM",
+      opening: "08:30",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/vail-mountain-resort.avif",
+    imageUrl: "/resorts/vail-mountain-resort.jpg",
     websiteUrl: "https://www.vail.com",
-    description: "Vail Mountain Resort is one of the largest ski resorts in North America."
+    description: "One of the largest ski resorts in North America, known for its legendary Back Bowls and upscale amenities."
   },
   {
     id: "aspen",
     name: "Aspen Snowmass",
     location: {
-      lat: 39.2084,
-      lng: -106.9490,
-      address: "Snowmass Village, Colorado 81615",
+      lat: 39.1911,
+      lng: -106.8317,
+      address: "Aspen, Colorado",
       state: "Colorado",
       country: "USA"
     },
     difficulty: {
-      beginner: 5,
-      intermediate: 48,
-      advanced: 30,
-      expert: 17
+      beginner: 10,
+      intermediate: 44,
+      advanced: 46,
+      expert: 0
     },
     amenities: {
       nightSkiing: false,
@@ -71,43 +71,43 @@ export const resorts: Resort[] = [
       gondola: true
     },
     stats: {
-      baseElevation: 8104,
+      baseElevation: 8000,
       peakElevation: 12510,
       verticalDrop: 4406,
-      numberOfLifts: 20,
-      numberOfRuns: 98
+      numberOfLifts: 40,
+      numberOfRuns: 362
     },
     weather: {
       temperature: 30,
       condition: "Partly Cloudy",
       snowfall24h: 2,
-      snowDepth: 38,
-      lastUpdated: new Date().toISOString()
+      snowDepth: 52,
+      lastUpdated: "2024-02-20T08:00:00Z"
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "3:30 PM",
+      opening: "09:00",
+      closing: "15:30",
       isOpen: true
     },
-    imageUrl: "/resorts/aspen-snowmass.avif",
+    imageUrl: "/resorts/aspen-snowmass.jpg",
     websiteUrl: "https://www.aspensnowmass.com",
-    description: "Aspen Snowmass is a world-renowned ski resort featuring four unique mountains."
+    description: "Four unique mountains offering diverse terrain and a world-class resort experience."
   },
   {
     id: "park-city",
     name: "Park City Mountain Resort",
     location: {
-      lat: 40.6461,
-      lng: -111.4980,
-      address: "Park City, Utah 84060",
+      lat: 40.6514,
+      lng: -111.5089,
+      address: "Park City, Utah",
       state: "Utah",
       country: "USA"
     },
     difficulty: {
       beginner: 17,
       intermediate: 52,
-      advanced: 21,
-      expert: 10
+      advanced: 31,
+      expert: 0
     },
     amenities: {
       nightSkiing: true,
@@ -128,16 +128,16 @@ export const resorts: Resort[] = [
       condition: "Snowing",
       snowfall24h: 4,
       snowDepth: 65,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: "2024-02-20T08:00:00Z"
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "4:00 PM",
+      opening: "09:00",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/park-city-mountain-resort.avif",
+    imageUrl: "/resorts/park-city-mountain-resort.jpg",
     websiteUrl: "https://www.parkcitymountain.com",
-    description: "Park City Mountain Resort is the largest ski resort in the United States."
+    description: "The largest ski resort in the United States, offering diverse terrain and historic charm."
   },
   {
     id: "mammoth",
@@ -145,15 +145,15 @@ export const resorts: Resort[] = [
     location: {
       lat: 37.6308,
       lng: -119.0326,
-      address: "Mammoth Lakes, California 93546",
+      address: "Mammoth Lakes, California",
       state: "California",
       country: "USA"
     },
     difficulty: {
       beginner: 25,
       intermediate: 40,
-      advanced: 25,
-      expert: 10
+      advanced: 35,
+      expert: 0
     },
     amenities: {
       nightSkiing: false,
@@ -173,39 +173,39 @@ export const resorts: Resort[] = [
       temperature: 35,
       condition: "Sunny",
       snowfall24h: 0,
-      snowDepth: 120,
-      lastUpdated: new Date().toISOString()
+      snowDepth: 85,
+      lastUpdated: "2024-02-20T08:00:00Z"
     },
     operatingHours: {
-      opening: "8:30 AM",
-      closing: "4:00 PM",
+      opening: "08:30",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/mammoth-mountain.avif",
+    imageUrl: "/resorts/mammoth-mountain.jpg",
     websiteUrl: "https://www.mammothmountain.com",
-    description: "Mammoth Mountain is California's highest ski resort."
+    description: "California's highest ski resort, known for its long season and exceptional terrain parks."
   },
   {
     id: "jackson-hole",
     name: "Jackson Hole Mountain Resort",
     location: {
       lat: 43.5875,
-      lng: -110.8271,
-      address: "Teton Village, Wyoming 83025",
+      lng: -110.8279,
+      address: "Teton Village, Wyoming",
       state: "Wyoming",
       country: "USA"
     },
     difficulty: {
       beginner: 10,
       intermediate: 40,
-      advanced: 35,
-      expert: 15
+      advanced: 50,
+      expert: 0
     },
     amenities: {
       nightSkiing: false,
       rentals: true,
       lessons: true,
-      terrain_park: false,
+      terrain_park: true,
       gondola: true
     },
     stats: {
@@ -219,17 +219,17 @@ export const resorts: Resort[] = [
       temperature: 25,
       condition: "Snowing",
       snowfall24h: 6,
-      snowDepth: 85,
-      lastUpdated: new Date().toISOString()
+      snowDepth: 92,
+      lastUpdated: "2024-02-20T08:00:00Z"
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "4:00 PM",
+      opening: "09:00",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/jackson-hole-mountain-resort.avif",
+    imageUrl: "/resorts/jackson-hole-mountain-resort.jpg",
     websiteUrl: "https://www.jacksonhole.com",
-    description: "Jackson Hole Mountain Resort is famous for its steep terrain and deep powder."
+    description: "Legendary steep terrain and deep powder, featuring the iconic Corbet's Couloir."
   },
   {
     id: "steamboat",
@@ -269,11 +269,11 @@ export const resorts: Resort[] = [
       lastUpdated: new Date().toISOString()
     },
     operatingHours: {
-      opening: "8:30 AM",
-      closing: "4:00 PM",
+      opening: "08:30",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/steamboat-ski-resort.avif",
+    imageUrl: "/resorts/steamboat-ski-resort.jpg",
     websiteUrl: "https://www.steamboat.com",
     description: "Steamboat is famous for its Champagne Powder® snow and western hospitality."
   },
@@ -315,11 +315,11 @@ export const resorts: Resort[] = [
       lastUpdated: new Date().toISOString()
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "4:00 PM",
+      opening: "09:00",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/killington-resort.avif",
+    imageUrl: "/resorts/killington-resort.jpg",
     websiteUrl: "https://www.killington.com",
     description: "Known as 'The Beast of the East,' Killington is the largest ski resort in Eastern North America."
   },
@@ -361,11 +361,11 @@ export const resorts: Resort[] = [
       lastUpdated: new Date().toISOString()
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "4:00 PM",
+      opening: "09:00",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/snowbird.avif",
+    imageUrl: "/resorts/snowbird.jpg",
     websiteUrl: "https://www.snowbird.com",
     description: "Snowbird is known for its deep powder snow and steep terrain."
   },
@@ -407,11 +407,11 @@ export const resorts: Resort[] = [
       lastUpdated: new Date().toISOString()
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "4:00 PM",
+      opening: "09:00",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/big-sky-resort.avif",
+    imageUrl: "/resorts/big-sky-resort.jpg",
     websiteUrl: "https://www.bigskyresort.com",
     description: "Big Sky Resort offers the Biggest Skiing in America with 5,850 acres of terrain."
   },
@@ -453,11 +453,11 @@ export const resorts: Resort[] = [
       lastUpdated: new Date().toISOString()
     },
     operatingHours: {
-      opening: "9:00 AM",
-      closing: "4:00 PM",
+      opening: "09:00",
+      closing: "16:00",
       isOpen: true
     },
-    imageUrl: "/resorts/palisades-tahoe.avif",
+    imageUrl: "/resorts/palisades-tahoe.jpg",
     websiteUrl: "https://www.palisadestahoe.com",
     description: "Home to the 1960 Winter Olympics, Palisades Tahoe offers world-class terrain across two mountains."
   }
